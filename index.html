@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAGREB GEZİ REHBERİ</title>
+    <style>
+        :root {
+            --primary: #c0392b; 
+            --secondary: #2c3e50;
+            --accent: #e67e22;
+            --light: rgba(255, 255, 255, 0.95);
+            --dark: #2f3640;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: var(--font-main); 
+            color: var(--dark); 
+            line-height: 1.6;
+            background-image: url('zagreb_bg2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .overlay { min-height: 100vh; background: rgba(255,255,255,0.4); padding-bottom: 50px;}
+
+        header {
+            background: linear-gradient(rgba(44, 62, 80, 0.75), rgba(44, 62, 80, 0.85));
+            color: white; text-align: center; padding: 2.5rem 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-bottom: 4px solid var(--accent);
+            backdrop-filter: blur(5px);
+        }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px;}
+        header p { font-size: 1.1rem; color: #ecf0f1; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+        /* Tabs Navigation */
+        .tabs { display: flex; justify-content: center; background: rgba(255,255,255,0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; backdrop-filter: blur(10px);}
+        .tab-btn {
+            background: none; border: none; padding: 15px 20px; font-size: 1.05rem; font-weight: bold; color: var(--secondary);
+            cursor: pointer; transition: all 0.3s ease; border-bottom: 4px solid transparent; flex: 1; text-align: center; max-width: 250px;
+        }
+        .tab-btn:hover { background-color: rgba(240,243,244,0.5); color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background-color: rgba(240,243,244,0.8); }
+
+        .tab-content { display: none; margin-top: 1.5rem; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HAVUZ (Opsiyonel Duraklar Paneli) */
+        .controls {
+            background: var(--light); padding: 1.5rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem; border-left: 5px solid var(--primary); backdrop-filter: blur(10px);
+        }
+        .controls h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--secondary); display:flex; align-items:center; gap:10px; }
+        .pool-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;}
+        
+        .pool-btn {
+            background: white; border: 1px solid #e9ecef; border-radius: 30px; padding: 6px 14px 6px 6px;
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;
+            font-family: var(--font-main); font-size: 0.9rem; font-weight: 600; color: var(--secondary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .pool-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: #fdf2e9;}
+        .phase-badge { background: #f0f3f4; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; color: #475569; display:flex; align-items:center; gap:4px; font-weight:700;}
+        .add-icon { color: #27ae60; font-weight: bold; margin-left: 4px; font-size: 1rem;}
+        .empty-pool { font-size: 0.95rem; color: #7f8c8d; font-style: italic; padding: 10px; background: rgba(248,249,250,0.8); border-radius: 8px; width: 100%; text-align: center;}
+
+        /* Timeline */
+        .timeline-container { background: var(--light); border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(10px); }
+        .timeline { position: relative; display: flex; flex-direction: column; gap: 20px; }
+        .timeline::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 50px; width: 4px;
+            background: var(--primary); opacity: 0.3; border-radius: 4px;
+        }
+
+        .tl-item { display: flex; gap: 20px; position: relative; animation: slideIn 0.3s ease-out; }
+        
+        .tl-icon {
+            width: 44px; height: 44px; background: white; border: 3px solid var(--primary);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; z-index: 2; flex-shrink: 0; margin-left: 30px; box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tl-content {
+            background: white; padding: 1.2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            flex: 1; border-left: 4px solid var(--primary); transition: transform 0.2s;
+        }
+        .tl-content:hover { transform: translateX(3px); }
+        
+        .tl-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .tl-title { font-size: 1.1rem; font-weight: 700; color: var(--secondary); display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1;}
+        .tl-time { background: #f0f3f4; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #7f8c8d; border: 1px solid #e9ecef;}
+        .tl-desc { font-size: 0.95rem; color: #555; }
+        .tl-phase-label { display: inline-block; padding: 6px 14px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; color: white; margin-bottom: 5px; margin-top:10px; z-index:2;}
+        .phase-morning { background: var(--accent); }
+        .phase-afternoon { background: #8e44ad; }
+        
+        .maps-btn-small { background: #ea4335; color: white; padding: 4px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: bold; white-space: nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .maps-btn-small:hover { background: #c0392b; }
+
+        .remove-btn { background: #fff0f0; color: #e74c3c; border: 1px solid #fadbd8; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .remove-btn:hover { background: #e74c3c; color: white; }
+
+        /* Routes Panel */
+        .routes-panel { display: flex; flex-direction: column; gap: 15px; }
+        .route-btn {
+            text-align: center; padding: 18px; border-radius: 12px;
+            text-decoration: none; font-weight: bold; color: white; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s;
+        }
+        .route-btn:hover { transform: translateY(-3px); }
+        .btn-morning { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .btn-afternoon { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .route-card { background: var(--light); padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); margin-bottom: 1.5rem; backdrop-filter: blur(10px);}
+
+        /* Priorities Tab */
+        .priority-section { background: var(--light); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 1.5rem; border-left: 5px solid; backdrop-filter: blur(10px);}
+        .priority-section.s1 { border-color: #c0392b; }
+        .priority-section.s2 { border-color: #f39c12; }
+        .priority-section.s3 { border-color: #27ae60; }
+        .priority-section h2 { margin-bottom: 1rem; font-size: 1.3rem; color: var(--secondary); display: flex; align-items: center; gap: 10px;}
+        .priority-list { list-style: none; }
+        .priority-list li { margin-bottom: 10px; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .priority-list li strong { display: block; color: var(--dark); font-size: 1.05rem; margin-bottom: 3px;}
+
+        /* Transport Tab */
+        .transport-info { background: var(--light); color: var(--dark); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 6px 15px rgba(0,0,0,0.1); border-left: 5px solid var(--primary); backdrop-filter: blur(10px);}
+        .transport-info h3 { color: var(--secondary); margin-bottom: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;}
+        .price-box { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;}
+        .price-item { background: white; padding: 15px; border-radius: 12px; flex: 1; min-width: 120px; text-align: center; border: 1px solid #e9ecef; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .price-item span { color: #7f8c8d; font-weight: 600; font-size: 0.9rem;}
+        .price-item strong { display: block; font-size: 1.6rem; color: var(--primary); margin-top: 5px; font-weight: 800;}
+
+        @media (max-width: 600px) {
+            .timeline-container { padding: 1.5rem 1rem; }
+            .timeline::before { left: 23px; }
+            .tl-icon { margin-left: 4px; width: 38px; height: 38px; font-size: 1rem; border-width: 2px;}
+            .tl-item { gap: 12px; }
+            .controls { padding: 1.2rem; }
+            .tab-btn { padding: 12px 10px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay">
+        <header>
+            <h1>ZAGREB GEZİ REHBERİ</h1>
+            <p>12 Haziran Pazartesi</p>
+        </header>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('tab-timeline')">🕒 Gezi Planı</button>
+            <button class="tab-btn" onclick="openTab('tab-priority')">⭐ Önem Sırası</button>
+            <button class="tab-btn" onclick="openTab('tab-routes')">🗺️ Ulaşım & Rotalar</button>
+        </div>
+
+        <div class="container">
+            
+            <!-- TAB 1: DİNAMİK PLAN -->
+            <div id="tab-timeline" class="tab-content active">
+                
+                <div class="controls">
+                    <h2>⚙️ Durak Havuzu (Ekle / Çıkar)</h2>
+                    <p style="font-size:0.9rem; color:#555;">Plandan çıkardığınız duraklar bu havuza düşer. İhtiyacınıza göre aralara ekleyip çıkarabilirsiniz. Seçimleriniz zaman çizelgesini ve Ulaşım & Rotalardaki Google Harita rotalarını anında günceller.</p>
+                    <div class="pool-group" id="pool">
+                        <!-- Pool items generated by JS -->
+                    </div>
+                </div>
+
+                <div class="timeline-container">
+                    <div class="timeline" id="timeline">
+                        <!-- Timeline items generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ÖNEM SIRASI -->
+            <div id="tab-priority" class="tab-content">
+                <div class="priority-section s1">
+                    <h2>🔴 1. Derece (Kesin Görün)</h2>
+                    <ul class="priority-list">
+                        <li><strong>Ban Jelačić Meydanı</strong> Şehrin tam kalbi, her yere buradan dağılınır.</li>
+                        <li><strong>Lotrščak Kulesi (Grič Topu)</strong> Saat tam 12:00'de patlayan top. Öğrenciler için günün en ilginç ritüeli.</li>
+                        <li><strong>St. Mark Kilisesi</strong> Renkli lego çatısı ile meşhur. Mutlaka önünde fotoğraf çektirilmeli.</li>
+                        <li><strong>İllüzyonlar veya Çikolata Müzesi</strong> Tarihi geziden sonra sıkılmamaları için interaktif etkinlik.</li>
+                        <li><strong>Zagreb Katedrali</strong> Şehrin sembolik devasa yapısı.</li>
+                    </ul>
+                </div>
+
+                <div class="priority-section s2">
+                    <h2>🟠 2. Derece (Vakit Varsa)</h2>
+                    <ul class="priority-list">
+                        <li><strong>Zagreb Füniküleri</strong> Sadece 66 saniye sürer. Yürüyerek de çıkılabilir ama füniküler çok eğlencelidir.</li>
+                        <li><strong>Tkalčićeva Caddesi</strong> Serbest zaman, tatlı veya hediyelik eşya için en güvenli, trafiğe kapalı cadde.</li>
+                        <li><strong>Dolac Pazarı</strong> Yöresel yaşam, meyve/sebze pazarı.</li>
+                    </ul>
+                </div>
+
+                <div class="priority-section s3">
+                    <h2>🟢 3. Derece (Geçerken)</h2>
+                    <ul class="priority-list">
+                        <li><strong>Taş Kapı (Kamenita Vrata)</strong> Zaten kiliseden aşağı inerken rotanın üzerinde olan tarihi yaya geçidi.</li>
+                        <li><strong>Zrinjevac Parkı</strong> Grupta yorulma olursa oturup dinlenmek için kullanılır.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 3: ULAŞIM & ROTALAR -->
+            <div id="tab-routes" class="tab-content">
+                
+                <div class="transport-info">
+                    <h3>🚋 Toplu Taşıma (ZET) Hakkında Her Şey</h3>
+                    <p style="color: #555; margin-bottom:10px;">Otel (Zonar) ile Merkez (Ban Jelačić) arasında tramvay kullanılacaktır. Merkez içi tamamen yürüyüş alanıdır.</p>
+                    <div class="price-box">
+                        <div class="price-item">
+                            <span>Tek Yön (30 Dk)</span>
+                            <strong>0,53 €</strong>
+                        </div>
+                        <div class="price-item">
+                            <span>Kişi Başı Günlük (4 Kez)</span>
+                            <strong>2,12 €</strong>
+                        </div>
+                    </div>
+                    
+                    <ul style="margin-top:15px; margin-left:20px; line-height:1.7; color: #444; font-size:0.95rem;">
+                        <li>Biletleri duraklarda bulunan <strong>"Tisak" veya "iNovine"</strong> büfelerinden alabilirsiniz (Şoförden almak daha pahalıdır).</li>
+                        <li>Alternatif olarak telefonunuza <strong>"Moj ZET"</strong> uygulamasını indirip biletleri dijital olarak da kolayca alabilirsiniz.</li>
+                        <li style="color: #c0392b; font-weight:700;">DİKKAT: Tramvaya bindiğinizde kağıt bileti kapı kenarındaki sarı makinelere SADECE 1 KEZ okutun. İkinci kez okutursanız biletiniz iptal olur.</li>
+                        <li>Bilet kontrolleri oldukça sıktır (görevliler bazen sivil giyimli biner). Ceza (yaklaşık 30-40 Euro) ödememek için yolculuk bitene kadar biletleri kesinlikle atmayın.</li>
+                    </ul>
+                </div>
+
+                <div class="route-card">
+                    <h2 style="color:var(--secondary); margin-bottom:10px;">Yol Tarifleri (Google Maps)</h2>
+                    <p style="font-size:0.95rem; color:#555; margin-bottom:15px;">Dinamik planda eklediğiniz veya çıkardığınız duraklar bu butonların içindeki harita rotalarına otomatik olarak yansır.</p>
+                    <div class="routes-panel">
+                        <a href="#" id="btn-morning" target="_blank" class="route-btn btn-morning">
+                            <span style="font-size: 1.2rem;">🗺️ Sabah Rotasını Başlat</span>
+                            <span style="font-size: 0.85rem; font-weight: normal; opacity: 0.9;">Otelden > Öğle yemeğine kadar</span>
+                        </a>
+                        <a href="#" id="btn-afternoon" target="_blank" class="route-btn btn-afternoon">
+                            <span style="font-size: 1.2rem;">🗺️ Öğle Rotasını Başlat</span>
+                            <span style="font-size: 0.85rem; font-weight: normal; opacity: 0.9;">Otelden > Akşama kadar</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const routeData = [
+            // MORNING (Başlangıç 10:00)
+            { id: 'start', name: 'Zonar Zagreb', timeSpan: 15, maps: ['Zonar+Zagreb'], defaultVisible: true, removable: false, phase: 'morning', icon: '🏨', desc: 'Otele varış, bagaj teslimi ve hazırlık.' },
+            { id: 'ban_jelacic', name: 'Ban Jelačić Meydanı', timeSpan: 30, maps: ['Ban+Jelacic+Square,+Zagreb'], defaultVisible: true, removable: true, phase: 'morning', icon: '📍', desc: 'Tramvayla merkeze ulaşım.' },
+            { id: 'dolac', name: 'Dolac Pazarı', timeSpan: 45, maps: ['Dolac+Market,+Zagreb'], defaultVisible: false, removable: true, phase: 'morning', icon: '🍎', desc: 'Tarihi pazar ziyareti.' },
+            { id: 'funicular', name: 'Zagreb Füniküleri', timeSpan: 15, maps: ['Zagreb+Funicular'], price: '0,66 €', defaultVisible: false, removable: true, phase: 'morning', icon: '🚋', desc: '66 saniyelik yukarı şehir yolculuğu. (Tek yön bilet gişeden alınabilir)' },
+            { id: 'lotrscak', name: 'Lotrščak Kulesi', timeSpan: 20, maps: ['Lotrscak+Tower'], defaultVisible: true, removable: true, phase: 'morning', icon: '🏰', desc: 'Öğle saatlerinde top atışına hazırlık. (İçeri giriş yapmadan dışarıdan izlenecek)' },
+            { id: 'st_mark', name: 'St. Mark & Taş Kapı', timeSpan: 45, maps: ['St.+Mark\'s+Church,+Zagreb', 'Stone+Gate,+Zagreb'], defaultVisible: true, removable: true, phase: 'morning', icon: '⛪', desc: 'Renkli çatılı kilise ve tarihi geçit.' },
+            { id: 'lunch', name: 'Öğle Yemeği (Otel)', timeSpan: 0, maps: ['Zonar+Zagreb'], defaultVisible: true, removable: false, phase: 'morning', icon: '🍽️', desc: 'Tramvayla otele dönüş, yemek.' },
+            
+            // AFTERNOON (Başlangıç 15:00)
+            { id: 'illusion_museum', name: 'İllüzyonlar Müzesi', timeSpan: 75, maps: ['Museum+of+Illusions,+Zagreb'], price: '9,00 €', defaultVisible: true, removable: true, phase: 'afternoon', icon: '🎯', desc: 'Öğrenciler için interaktif, eğlenceli ve şaşırtıcı illüzyon deneyimleri.' },
+            { id: 'chocolate_museum', name: 'Çikolata Müzesi', timeSpan: 75, maps: ['Chocolate+Museum+Zagreb'], price: '9,50 €', defaultVisible: false, removable: true, phase: 'afternoon', icon: '🍫', desc: 'İllüzyonlar müzesine alternatif. (Plana dahil etmek isterseniz İllüzyonlar müzesini çıkarıp bunu ekleyebilirsiniz).' },
+            { id: 'cathedral', name: 'Zagreb Katedrali', timeSpan: 45, maps: ['Zagreb+Cathedral'], defaultVisible: true, removable: true, phase: 'afternoon', icon: '🕍', desc: 'Kaptol meydanı ve mimari.' },
+            { id: 'tkalciceva', name: 'Tkalčićeva Caddesi', timeSpan: 60, maps: ['Tkalciceva+Street,+Zagreb'], defaultVisible: false, removable: true, phase: 'afternoon', icon: '🍦', desc: 'Dondurma ve tatlı molası.' },
+            { id: 'zrinjevac', name: 'Zrinjevac Parkı', timeSpan: 45, maps: ['Zrinjevac+Park,+Zagreb'], defaultVisible: false, removable: true, phase: 'afternoon', icon: '🌳', desc: 'Yeşillikler içinde dinlenme.' },
+            { id: 'end', name: 'Otele Dönüş', timeSpan: 0, maps: ['Zonar+Zagreb'], defaultVisible: true, removable: false, phase: 'afternoon', icon: '🏨', desc: 'Akşam yemeği için istirahat.' }
+        ];
+
+        let visibilityState = {}; 
+
+        // Yardımcı fonksiyon: Saat ekleme
+        function addMinutes(timeString, minsToAdd) {
+            let [h, m] = timeString.split(':').map(Number);
+            m += minsToAdd;
+            h += Math.floor(m / 60);
+            m = m % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function init() {
+            routeData.forEach(item => {
+                visibilityState[item.id] = item.defaultVisible;
+            });
+            render();
+        }
+
+        function toggleVisibility(id) {
+            visibilityState[id] = !visibilityState[id];
+            render();
+        }
+        window.toggleVisibility = toggleVisibility;
+
+        function render() {
+            const timelineDiv = document.getElementById('timeline');
+            const poolDiv = document.getElementById('pool');
+            
+            timelineDiv.innerHTML = '';
+            poolDiv.innerHTML = '';
+
+            let currentPhase = '';
+            let morningMaps = [];
+            let afternoonMaps = [];
+            let poolCount = 0;
+
+            // Dinamik saat hesaplaması için başlangıç saatleri
+            let currentMorningTime = "10:00";
+            let currentAfternoonTime = "15:00";
+
+            routeData.forEach((item) => {
+                
+                // Havuza düşenler
+                if (!visibilityState[item.id]) {
+                    poolCount++;
+                    const phaseText = item.phase === 'morning' ? '☀️ Sabah' : '🌤️ Öğle';
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'pool-btn';
+                    btn.onclick = () => toggleVisibility(item.id);
+                    btn.innerHTML = `
+                        <span class="phase-badge">${phaseText}</span>
+                        ${item.icon} ${item.name}
+                        <span class="add-icon">➕</span>
+                    `;
+                    poolDiv.appendChild(btn);
+                    return; 
+                }
+
+                // Çizelgedeki duraklar
+                if(item.phase !== currentPhase) {
+                    const phaseEl = document.createElement('div');
+                    phaseEl.className = 'tl-phase-label phase-' + item.phase;
+                    phaseEl.textContent = item.phase === 'morning' ? 'SABAH ROTASI' : 'ÖĞLEDEN SONRA ROTASI';
+                    timelineDiv.appendChild(phaseEl);
+                    currentPhase = item.phase;
+                }
+
+                const mainLocation = item.maps[0];
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mainLocation}`;
+                
+                const removeBtnHtml = item.removable 
+                    ? `<button class="remove-btn" onclick="toggleVisibility('${item.id}')" title="Plandan Çıkar">❌</button>` 
+                    : '';
+
+                const priceBadgeHtml = item.price 
+                    ? `<span style="background: #27ae60; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px;">💳 ${item.price}</span>` 
+                    : '';
+
+                // Dinamik saati belirle ve sonrakini güncelle
+                let displayTime = "";
+                if (item.phase === 'morning') {
+                    displayTime = currentMorningTime;
+                    currentMorningTime = addMinutes(currentMorningTime, item.timeSpan);
+                } else {
+                    displayTime = currentAfternoonTime;
+                    currentAfternoonTime = addMinutes(currentAfternoonTime, item.timeSpan);
+                }
+
+                const el = document.createElement('div');
+                el.className = 'tl-item';
+                const borderColor = item.phase === 'morning' ? 'var(--accent)' : '#8e44ad';
+                
+                el.innerHTML = `
+                    <div class="tl-icon" style="border-color: ${borderColor}">${item.icon}</div>
+                    <div class="tl-content" style="border-left-color: ${borderColor}">
+                        <div class="tl-header">
+                            <div class="tl-title">
+                                ${item.name}
+                                ${priceBadgeHtml}
+                                ${removeBtnHtml}
+                                <a href="${mapsUrl}" target="_blank" class="maps-btn-small">📍 Konum</a>
+                            </div>
+                            <div class="tl-time">${displayTime}</div>
+                        </div>
+                        <div class="tl-desc">${item.desc}</div>
+                    </div>
+                `;
+                timelineDiv.appendChild(el);
+
+                if(item.phase === 'morning') morningMaps.push(...item.maps);
+                if(item.phase === 'afternoon') afternoonMaps.push(...item.maps);
+            });
+
+            if (poolCount === 0) {
+                poolDiv.innerHTML = '<div class="empty-pool">Eklenecek yeni durak kalmadı, listenizdeki her yer plana dahil edildi! 🎉</div>';
+            }
+
+            document.getElementById('btn-morning').href = "https://www.google.com/maps/dir/" + morningMaps.join('/');
+            
+            if(afternoonMaps.length > 0 && afternoonMaps[0] !== 'Zonar+Zagreb') {
+                afternoonMaps.unshift('Zonar+Zagreb');
+            }
+            document.getElementById('btn-afternoon').href = "https://www.google.com/maps/dir/" + afternoonMaps.join('/');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
